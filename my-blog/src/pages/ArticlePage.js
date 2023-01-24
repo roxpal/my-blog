@@ -23,7 +23,7 @@ const ArticlePage = () => {
             setArticleInfo(newArticleInfo); // changes state
         }
 
-        if (isLoading) {
+        if (!isLoading) {
             loadArticleInfo();
         }
     }, [articleId, user, isLoading]); // call useEffect only when component is first mounted

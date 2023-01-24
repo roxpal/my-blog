@@ -1,0 +1,4 @@
+/mongodb-data/
+/credentials.json
+/.env
+/prod-env.yaml

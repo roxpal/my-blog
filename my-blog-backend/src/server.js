@@ -1,7 +1,13 @@
 import express from "express";
 import fs from 'fs';
+import path from 'path';
 import admin from 'firebase-admin';
+import 'dotenv/config';
 import { db, connectToDb } from "./db.js";
+
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const credentials = JSON.parse(
     fs.readFileSync("./credentials.json")
@@ -15,6 +21,12 @@ const app = express();
 
 // Allows us to get the request.body whenever the client side sends extra information with their request
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "../build")));
+
+// Route handler when we receive a request that isn't to one of our /api/ routes
+app.get(/^(?!\/api).+/, (req, res) => {
+    res.sendFile(path.join(__dirname, "../build/index.html"));
+})
 
 // Allows us to get the request.user property whenever the client side sends credentials (authtoken)
 app.use(async (req, res, next) => {
@@ -97,9 +109,13 @@ app.post("/api/articles/:name/comments", async (req, res) => {
     }
 })
 
+// Allows the hosting platform to specify the port our app should listen to
+const PORT = process.env.PORT || 8000;
+
 // Connecting to a port
 connectToDb(() => {
-    app.listen(8000, () => {
-        console.log("Server is listening on port 8000")
+    console.log('Successfully connected to database!');
+    app.listen(PORT, () => {
+        console.log("Server is listening on port " + PORT);
     })
 })
